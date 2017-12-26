@@ -3,43 +3,34 @@ package com.ulfric.plugin.economy.command;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-import com.ulfric.dragoon.extension.inject.Inject;
-import com.ulfric.plugin.commands.Command;
-import com.ulfric.plugin.commands.argument.Argument;
+import com.ulfric.plugin.commands.CommandExtension;
 import com.ulfric.plugin.economy.BankAccount;
 import com.ulfric.plugin.economy.Economy;
 import com.ulfric.plugin.economy.Transaction;
 
-public abstract class SkeletalPayCommand extends Command {
+public interface SkeletalPayCommand extends CommandExtension {
 
-	@Inject
-	private Economy economy;
-
-	@Argument
-	protected BigDecimal amount;
-
-	@Override
-	public final void run() {
+	default void pay() {
 		if (!isValidAmount()) {
 			onInvalidAmount();
 			return;
 		}
 
 		BankAccount target = target();
-		BankAccount self = economy.getBankAccount(uniqueId());
+		BankAccount self = economy().getBankAccount(uniqueId());
 		if (Objects.equals(target.getAccountIdentifier(), self.getAccountIdentifier())) {
 			onPaySelf();
 			return;
 		}
 
 		Transaction take = new Transaction();
-		take.setAmount(amount.negate());
+		take.setAmount(amount().negate());
 		take.setCounterparty(target.getAccountIdentifier());
 		take.setReason(reason());
 
 		if (self.execute(take)) {
 			Transaction give = new Transaction();
-			give.setAmount(amount);
+			give.setAmount(amount());
 			give.setCounterparty(self.getAccountIdentifier());
 			give.setReason(reason());
 
@@ -52,20 +43,24 @@ public abstract class SkeletalPayCommand extends Command {
 		}
 	}
 
-	protected abstract boolean isValidAmount();
+	Economy economy();
 
-	protected abstract BankAccount target();
+	BigDecimal amount();
 
-	protected abstract String reason();
+	boolean isValidAmount();
 
-	protected abstract void onPaySelf();
+	BankAccount target();
 
-	protected abstract void onPayTarget();
+	String reason();
 
-	protected abstract void onPaidBySender();
+	void onPaySelf();
 
-	protected abstract void onPaymentFail();
+	void onPayTarget();
 
-	protected abstract void onInvalidAmount();
+	void onPaidBySender();
+
+	void onPaymentFail();
+
+	void onInvalidAmount();
 
 }

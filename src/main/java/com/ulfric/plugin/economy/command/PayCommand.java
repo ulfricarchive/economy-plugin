@@ -1,5 +1,6 @@
 package com.ulfric.plugin.economy.command;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -8,45 +9,64 @@ import org.bukkit.entity.Player;
 import com.ulfric.commons.math.NumberHelper;
 import com.ulfric.commons.value.UniqueIdHelper;
 import com.ulfric.dragoon.extension.inject.Inject;
+import com.ulfric.plugin.commands.Command;
 import com.ulfric.plugin.commands.argument.Argument;
 import com.ulfric.plugin.economy.BankAccount;
 import com.ulfric.plugin.economy.Economy;
 
-public class PayCommand extends SkeletalPayCommand { // TODO should we set a minimum amount to avoid /pay spamming?
+public class PayCommand extends Command implements SkeletalPayCommand { // TODO should we set a minimum amount to avoid /pay spamming?
+
+	@Override
+	public void run() {
+		pay();
+	}
 
 	@Inject
 	private Economy economy;
 
 	@Argument
-	protected BankAccount target;
+	private BankAccount target;
+
+	@Argument
+	private BigDecimal amount;
 
 	@Override
-	protected boolean isValidAmount() {
-		return NumberHelper.isPositive(amount);
+	public boolean isValidAmount() {
+		return NumberHelper.isPositive(amount());
 	}
 
 	@Override
-	protected BankAccount target() {
+	public Economy economy() {
+		return economy;
+	}
+
+	@Override
+	public BigDecimal amount() {
+		return amount;
+	}
+
+	@Override
+	public BankAccount target() {
 		return target;
 	}
 
 	@Override
-	protected String reason() {
+	public String reason() {
 		return "/pay";
 	}
 
 	@Override
-	protected void onPaySelf() {
+	public void onPaySelf() {
 		tell("economy-pay-self");
 	}
 
 	@Override
-	protected void onPayTarget() {
+	public void onPayTarget() {
 		tell("economy-pay-target");
 	}
 
 	@Override
-	protected void onPaidBySender() {
+	public void onPaidBySender() {
 		UUID targetUniqueId = UniqueIdHelper.parseUniqueIdExact(target.getAccountIdentifier());
 		if (targetUniqueId != null) {
 			Player player = Bukkit.getPlayer(targetUniqueId);
@@ -57,12 +77,12 @@ public class PayCommand extends SkeletalPayCommand { // TODO should we set a min
 	}
 
 	@Override
-	protected void onPaymentFail() {
+	public void onPaymentFail() {
 		tell("economy-pay-fail");
 	}
 
 	@Override
-	protected void onInvalidAmount() {
+	public void onInvalidAmount() {
 		tell("economy-pay-positive");
 	}
 
