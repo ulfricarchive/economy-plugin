@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.ulfric.commons.naming.Name;
 import com.ulfric.commons.value.UniqueIdHelper;
 import com.ulfric.dragoon.extension.inject.Inject;
 import com.ulfric.plugin.commands.Command;
@@ -13,12 +14,8 @@ import com.ulfric.plugin.commands.argument.Argument;
 import com.ulfric.plugin.economy.BankAccount;
 import com.ulfric.plugin.economy.Economy;
 
+@Name("pay")
 public class PayCommand extends Command implements SkeletalPayCommand { // TODO should we set a minimum amount to avoid /pay spamming?
-
-	@Override
-	public void run() {
-		pay();
-	}
 
 	@Inject
 	private Economy economy;
@@ -28,6 +25,11 @@ public class PayCommand extends Command implements SkeletalPayCommand { // TODO 
 
 	@Argument
 	private BigDecimal amount;
+
+	@Override
+	public void run() {
+		pay();
+	}
 
 	@Override
 	public Economy economy() {

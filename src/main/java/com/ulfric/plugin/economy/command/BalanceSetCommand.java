@@ -1,29 +1,31 @@
 package com.ulfric.plugin.economy.command;
 
+import java.math.BigDecimal;
+
 import com.ulfric.commons.naming.Name;
 import com.ulfric.dragoon.extension.inject.Inject;
-import com.ulfric.plugin.commands.Command;
 import com.ulfric.plugin.commands.argument.Argument;
+import com.ulfric.plugin.commands.permissions.Permission;
 import com.ulfric.plugin.economy.BankAccount;
 import com.ulfric.plugin.economy.Economy;
 
-@Name("balance")
-public class BalanceCommand extends Command {
+@Name("set")
+@Permission("economy-balance-set")
+public class BalanceSetCommand extends BalanceCommand {
 
 	@Inject
 	private Economy economy;
 
-	@Argument(optional = true)
-	protected BankAccount target;
+	@Argument
+	private BankAccount target;
+
+	@Argument
+	protected BigDecimal amount;
 
 	@Override
 	public void run() {
-		if (target == null) {
-			target = economy.getBankAccount(uniqueId());
-			tell("economy-balance-self");
-		} else {
-			tell("economy-balance-target");
-		}
+		target.setBalance(amount);
+		tell("economy-balance-set");
 	}
 
 }
