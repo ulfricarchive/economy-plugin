@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.ulfric.commons.math.NumberHelper;
 import com.ulfric.commons.value.UniqueIdHelper;
 import com.ulfric.dragoon.extension.inject.Inject;
 import com.ulfric.plugin.commands.Command;
@@ -29,11 +28,6 @@ public class PayCommand extends Command implements SkeletalPayCommand { // TODO 
 
 	@Argument
 	private BigDecimal amount;
-
-	@Override
-	public boolean isValidAmount() {
-		return NumberHelper.isPositive(amount());
-	}
 
 	@Override
 	public Economy economy() {

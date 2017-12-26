@@ -3,6 +3,7 @@ package com.ulfric.plugin.economy.command;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+import com.ulfric.commons.math.NumberHelper;
 import com.ulfric.plugin.commands.CommandExtension;
 import com.ulfric.plugin.economy.BankAccount;
 import com.ulfric.plugin.economy.Economy;
@@ -10,17 +11,17 @@ import com.ulfric.plugin.economy.Transaction;
 
 public interface SkeletalPayCommand extends CommandExtension {
 
-	default void pay() {
+	default boolean pay() {
 		if (!isValidAmount()) {
 			onInvalidAmount();
-			return;
+			return false;
 		}
 
 		BankAccount target = target();
 		BankAccount self = economy().getBankAccount(uniqueId());
 		if (Objects.equals(target.getAccountIdentifier(), self.getAccountIdentifier())) {
 			onPaySelf();
-			return;
+			return false;
 		}
 
 		Transaction take = new Transaction();
@@ -38,22 +39,27 @@ public interface SkeletalPayCommand extends CommandExtension {
 
 			onPayTarget();
 			onPaidBySender();
-		} else {
-			onPaymentFail();
+			return true;
 		}
+
+		onPaymentFail();
+		return false;
+	}
+
+	default boolean isValidAmount() {
+		return NumberHelper.isPositive(amount());
 	}
 
 	Economy economy();
 
 	BigDecimal amount();
 
-	boolean isValidAmount();
-
 	BankAccount target();
 
 	String reason();
 
-	void onPaySelf();
+	default void onPaySelf() {
+	}
 
 	void onPayTarget();
 
