@@ -8,9 +8,11 @@ import com.ulfric.plugin.commands.argument.Argument;
 import com.ulfric.plugin.commands.permissions.Permission;
 import com.ulfric.plugin.economy.BankAccount;
 import com.ulfric.plugin.economy.Economy;
+import com.ulfric.plugin.restrictions.command.Restricted;
 
 @Name("set")
 @Permission("economy-balance-set")
+@Restricted("balance-set")
 public class BalanceSetCommand extends BalanceCommand {
 
 	@Inject
